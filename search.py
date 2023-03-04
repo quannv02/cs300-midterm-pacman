@@ -4,6 +4,7 @@ Pacman agents (in searchAgents.py).
 """
 
 from game import Directions
+import util
 
 n = Directions.NORTH
 s = Directions.SOUTH
@@ -26,9 +27,28 @@ def breadthFirstSearch(problem):
 
 
 def uniformCostSearch(problem):
-    '''
-    return a path to the goal
-    '''
+    frontier = util.PriorityQueue()
+    visited = []
+    
+    frontier.push((problem.getStartState(),[],0), 0)
+    (state, direction, cost) = frontier.pop()
+    visited.append((state,cost))
+
+    while not problem.isGoalState(state):
+        successors = problem.getSuccessors(state)
+        for child in successors:
+            visitedExist = False
+            totalCost = cost + child[2]   
+            for (visitedState,visitedCost) in visited:
+                if (child[0] == visitedState) and (totalCost >= visitedCost):
+                    visitedExist = True
+                    break
+            if not visitedExist:
+                frontier.push((child[0], direction + [child[1]], cost + child[2]), cost + child[2])
+                visited.append((child[0], cost + child[2]))  
+        (state, direction, cost) = frontier.pop() 
+    return direction
+
     # TODO 19
 
 
